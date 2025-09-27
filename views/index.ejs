@@ -1,0 +1,68 @@
+<%- include('partials/header') %>
+
+<main>
+    <% if (message) { %>
+        <div class="alert <%= alertClass %>"><%= message %></div>
+    <% } %>
+
+    <form action="/tasks" method="POST" class="new-entry-area">
+        <input type="text" name="title" placeholder="Enter task details..." required>
+        <select name="priority">
+            <option value="low">Low</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+        </select>
+        <button type="submit" class="btn-add">Go!</button>
+    </form>
+
+    <% if (tasks.length === 0) { %>
+        <div class="alert info">
+            Your todo list is empty! Add your first task above.
+        </div>
+    <% } else { %>
+    <ul class="todo-container">
+    <% tasks.forEach(task => { %>
+        <li class="list-item priority-<%= task.priority.toLowerCase() %>">
+          
+        <div class="view-mode" id="display-<%= task._id %>">
+            <div class="task-text">
+                <span><%= task.title %> (<%= task.priority %>)</span>
+            </div>
+
+            <div class="item-controls">
+                <button type="button" class="btn-edit" onclick="enableEdit('<%= task._id %>')">🖉</button>
+                <form action="/tasks/<%= task._id %>?_method=DELETE" method="POST" style="display:inline;">
+                    <button type="submit" class="btn-delete">X</button>
+                </form>
+            </div>
+        </div>
+
+        <form action="/tasks/<%= task._id %>?_method=PUT" method="POST" class="edit-form" id="form-<%= task._id %>" style="display:none;">
+            <input type="text" name="title" value="<%= task.title %>" required>
+            <select name="priority">
+                <option value="low" <%= task.priority === 'low' ? 'selected' : '' %>>Low</option>
+                <option value="high" <%= task.priority === 'high' ? 'selected' : '' %>>High</option>
+                <option value="urgent" <%= task.priority === 'urgent' ? 'selected' : '' %>>Urgent</option>
+            </select>
+            <button type="submit">💾 Save</button>
+            <button type="button" onclick="disableEdit('<%= task._id %>')">❌ Cancel</button>
+        </form>
+        </li>
+    <% }) %>
+    </ul>
+
+    <% } %>
+</main>
+<script>
+    function enableEdit(taskId) {
+        document.getElementById(`display-${taskId}`).style.display = 'none';
+        document.getElementById(`form-${taskId}`).style.display = 'block';
+    }
+
+    function disableEdit(taskId) {
+        document.getElementById(`form-${taskId}`).style.display = 'none';
+        document.getElementById(`display-${taskId}`).style.display = 'flex';
+    }
+</script>
+
+<%- include('partials/footer') %>
