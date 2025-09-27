@@ -49,13 +49,11 @@ app.get('/', async (req, res) => {
 
 app.post('/tasks', async (req, res) => {
     const { title, priority } = req.body;
-    
-    if (!title.trim()) {
+    if (!title || !title.trim()) {
         return res.redirect('/?message=Can\'t add an empty task!&alertClass=error'); 
     }
-
     try {
-        const newTask = new TodoItem({ title, priority });
+        const newTask = new TodoItem({ title, priority }); 
         await newTask.save();
         res.redirect('/?message=New item saved!&alertClass=success'); 
     } catch (err) {
@@ -66,13 +64,11 @@ app.post('/tasks', async (req, res) => {
 
 app.put('/tasks/:id', async (req, res) => {
     const { title, priority } = req.body;
-    
-    if (!title.trim()) {
-        return res.redirect('/?message=Please enter a task!&alertClass=error');
+    if (!title || !title.trim()) {
+        return res.redirect('/?message=Update failed: task title is empty!&alertClass=error');
     }
-
     try {
-        await TodoItem.findByIdAndUpdate(req.params.id, { title, priority });
+        await TodoItem.findByIdAndUpdate(req.params.id, { title, priority }); 
         res.redirect('/?message=Update successful!&alertClass=success'); 
     } catch (err) {
         console.warn("An operation failed (PUT /tasks/:id):", err);
@@ -82,7 +78,7 @@ app.put('/tasks/:id', async (req, res) => {
 
 app.delete('/tasks/:id', async (req, res) => {
     try {
-        await TodoItem.findByIdAndDelete(req.params.id);
+        await TodoItem.findByIdAndDelete(req.params.id); 
         res.redirect('/?message=Task removed!&alertClass=success');
     } catch (err) {
         console.warn("An operation failed (DELETE /tasks/:id):", err);
